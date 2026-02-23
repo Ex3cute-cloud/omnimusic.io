@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI PLAYER | Ultimate Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* === ПЕРЕМЕННЫЕ И БАЗА === */
+        :root {
+            --bg-deep: #050308;
+            --bg-card: rgba(20, 15, 30, 0.4);
+            --bg-card-hover: rgba(30, 20, 45, 0.6);
+            --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.4);
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(139, 92, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* === АНИМИРОВАННЫЙ ФОН === */
+        .ambient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 0%, #150a21 0%, var(--bg-deep) 70%);
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: floatOrb 20s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 400px; height: 400px; background: #6d28d9; top: -10%; left: -10%; }
+        .orb-2 { width: 500px; height: 500px; background: #4c1d95; bottom: -20%; right: -10%; animation-delay: -5s; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        /* === НАВИГАЦИЯ === */
+        nav {
+            position: fixed;
+            top: 0; width: 100%;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(5, 3, 8, 0.7);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo span { color: var(--accent); }
+        
+        .eq-icon { display: flex; gap: 3px; height: 16px; align-items: flex-end; }
+        .eq-bar { width: 3px; background: var(--accent); border-radius: 2px; animation: eqAnim 1s infinite alternate; }
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes eqAnim { 0% { height: 4px; } 100% { height: 16px; } }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #7c3aed;
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        /* === ГЛАВНЫЙ ЭКРАН (HERO) === */
+        .hero {
+            padding: 180px 8% 100px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 5vw;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .showcase-container {
+            perspective: 1000px;
+            margin-top: 60px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .showcase-img {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 80px rgba(139, 92, 246, 0.2);
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* === BENTO СЕТКА ПРЕИМУЩЕСТВ === */
+        .section-title {
+            text-align: center;
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 60px;
+        }
+
+        .features { padding: 100px 8%; }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bento-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .bento-card:hover::before { opacity: 1; }
+        .bento-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-5px);
+            background: var(--bg-card-hover);
+        }
+
+        .card-large { grid-column: span 2; }
+        
+        .card-icon {
+            margin-bottom: 25px;
+            width: 64px; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 16px;
+            background: rgba(139, 92, 246, 0.05);
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+
+        /* Стилизация SVG иконок */
+        .card-icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: var(--accent);
+            stroke-width: 1.5;
+            fill: none;
+            filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6)); /* Неоновое свечение иконки */
+        }
+
+        .bento-card h3 { font-size: 24px; margin-bottom: 10px; font-weight: 700; }
+        .bento-card p { color: var(--text-muted); line-height: 1.6; font-size: 15px; }
+
+        /* === ТАРИФЫ === */
+        .pricing {
+            padding: 100px 8%;
+            background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, transparent 100%);
+        }
+
+        .pricing-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .price-item {
+            background: rgba(15, 10, 20, 0.8);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 16px;
+            width: 320px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .price-item:hover {
+            background: rgba(25, 15, 35, 0.9);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 10px 40px rgba(139, 92, 246, 0.1);
+        }
+
+        .price-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .price-header svg { width: 18px; height: 18px; stroke: var(--text-muted); stroke-width: 2; fill: none; }
+
+        .price-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .badge svg { width: 14px; height: 14px; stroke: var(--accent); stroke-width: 2; fill: none; }
+
+        .price-desc {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            min-height: 60px;
+        }
+
+        .btn-outline {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: 0.3s;
+            z-index: 2;
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--accent);
+            background: rgba(139, 92, 246, 0.15);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        }
+
+        /* 3D Иконки тарифов внизу карточек */
+        .price-gfx {
+            margin-top: 40px;
+            width: 100%;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.3;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .price-gfx svg {
+            width: 120px;
+            height: 120px;
+            stroke: #fff;
+            stroke-width: 1;
+            fill: none;
+        }
+
+        .price-item:hover .price-gfx {
+            opacity: 1;
+            transform: scale(1.15) translateY(-10px);
+        }
+        .price-item:hover .price-gfx svg {
+            stroke: var(--accent);
+            filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.5));
+        }
+
+        /* === АНИМАЦИИ === */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #555;
+            font-size: 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 900px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .card-large { grid-column: span 1; }
+            h1 { font-size: 40px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <nav>
+        <div class="logo">
+            <div class="eq-icon">
+                <div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div>
+            </div>
+            OMNI <span>PLAYER</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Функции</a>
+            <a href="#pricing">Тарифы</a>
+            <a href="#">Обзоры</a>
+        </div>
+        <a href="https://workupload.com/start/WXQ9yuYJt8N" class="btn">Бесплатная версия</a>
+    </nav>
+
+    <section class="hero">
+        <h1 class="reveal">Лучший плеер для<br>комфортного звука</h1>
+        <p class="subtitle reveal" style="transition-delay: 0.1s;">
+            OMNI создан для тех, кто ценит стиль, гибкость и максимальное качество. Продвинутый эквалайзер, 8D-аудио и завораживающий интерфейс дают вам реальное превосходство в музыке.
+        </p>
+        
+        <div class="showcase-container reveal" style="transition-delay: 0.2s;" id="tilt-container">
+            <img src="interface.png" alt="OMNI Interface" class="showcase-img" id="tilt-img">
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <h2 class="section-title reveal">Преимущества нашего плеера</h2>
+        
+        <div class="bento-grid">
+            <div class="bento-card card-large reveal">
+                <div class="card-icon">
+                    <!-- Иконка ползунков (Эквалайзер) -->
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21v-7m0-4V3m8 18v-9m0-4V3m8 18v-5m0-4V3M1 14h6m2-6h6m2 8h6"/></svg>
+                </div>
+                <h3>Студия частот</h3>
+                <p>Мощный набор функций, выводящий контроль звука на новый уровень. Оптимизированный алгоритм позволяет настраивать Bass, Mid, Treble и скорость трека (Speed) без потери качества звука. Идеально для любого жанра.</p>
+            </div>
+            
+            <div class="bento-card reveal" style="transition-delay: 0.1s;">
+                <div class="card-icon">
+                    <!-- Иконка 3D куба (Пространственный звук 8D) -->
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline stroke-linecap="round" stroke-linejoin="round" points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line stroke-linecap="round" stroke-linejoin="round" x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                </div>
+                <h3>Аудио FX и 8D</h3>
+                <p>Активируйте вращение 8D AUDIO для полного погружения. Управляйте панорамой звука (L/R) тонкими настройками слайдера.</p>
+            </div>
+
+            <div class="bento-card reveal" style="transition-delay: 0.2s;">
+                <div class="card-icon">
+                    <!-- Иконка искр/магии (Визуализаторы) -->
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                </div>
+                <h3>Режимы фона</h3>
+                <p>Наслаждайтесь музыкой с элегантным визуальным сопровождением: Спектр, Матрица, Вортекс, Космос и эффект Нейросети.</p>
+            </div>
+
+            <div class="bento-card card-large reveal" style="transition-delay: 0.3s;">
+                <div class="card-icon">
+                    <!-- Иконка папки с музыкой (Библиотека) -->
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                </div>
+                <h3>Гибкая библиотека</h3>
+                <p>Локальная база данных, поддержка плейлистов и мгновенный импорт файлов. Ваш интерфейс остается чистым, минималистичным и не нагружает систему.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="pricing">
+        <h2 class="section-title reveal">Ваш идеальный тариф здесь</h2>
+        <p style="text-align:center; color: var(--text-muted); margin-top: -40px; margin-bottom: 60px; font-size: 15px;" class="reveal">Несколько вариантов подписки, чтобы вы платили только за то, что действительно нужно.</p>
+
+        <div class="pricing-grid">
+            
+            <div class="price-item reveal">
+                <div class="price-header">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    OmniVisuals
+                </div>
+                <div class="price-title">30 дней</div>
+                <div class="price-desc">Приобретая этот товар, вы получаете 30-дневный доступ к полному функционалу OMNI.</div>
+                <a href="#" class="btn-outline">Приобрести</a>
+                <div class="price-gfx">
+                    <!-- Иконка песочных часов -->
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+            </div>
+
+            <div class="price-item reveal" style="transition-delay: 0.1s;">
+                <div class="price-header">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    OmniVisuals
+                </div>
+                <div class="price-title">180 дней 
+                    <span class="badge">
+                        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>
+                    </span>
+                </div>
+                <div class="price-desc">Вместе с этим товаром вы открываете себе полгода полного доступа к OMNI Player.</div>
+                <a href="#" class="btn-outline">Приобрести</a>
+                <div class="price-gfx">
+                    <!-- Иконка наушников -->
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a9 9 0 0 1 18 0v6"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+                </div>
+            </div>
+
+            <div class="price-item reveal" style="transition-delay: 0.2s;">
+                <div class="price-header">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    OmniVisuals
+                </div>
+                <div class="price-title">Навсегда</div>
+                <div class="price-desc">Максимум возможностей OMNI — навсегда, без продлений и доплат.</div>
+                <a href="#" class="btn-outline">Приобрести</a>
+                <div class="price-gfx">
+                    <!-- Иконка бесконечности / ромба -->
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 10a4 4 0 0 0-8 0v4a4 4 0 0 0 8 0v-4z"/></svg>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 OMNI Player. Все системы работают штатно.</p>
+    </footer>
+
+    <script>
+        const container = document.getElementById('tilt-container');
+        const img = document.getElementById('tilt-img');
+
+        container.addEventListener('mousemove', (e) => {
+            const rect = container.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -10;
+            const rotateY = ((x - centerX) / centerX) * 10;
+            img.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        });
+
+        container.addEventListener('mouseleave', () => {
+            img.style.transform = `rotateX(0deg) rotateY(0deg) scale(1)`;
+        });
+
+        const reveals = document.querySelectorAll('.reveal');
+        function checkScroll() {
+            const triggerBottom = window.innerHeight * 0.85;
+            reveals.forEach(reveal => {
+                const revealTop = reveal.getBoundingClientRect().top;
+                if (revealTop < triggerBottom) {
+                    reveal.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll', checkScroll);
+        checkScroll();
+
+        const cards = document.querySelectorAll('.bento-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+</html>
